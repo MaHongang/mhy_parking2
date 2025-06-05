@@ -5,7 +5,8 @@ target_include_directories(open_space_trajectory_optimizer PUBLIC
                         ${PROJECT_SOURCE_DIR}#工程目录
                          "usr/include"#系统目录
                          "usr/local/include"#安装文件目录
-                         "/usr/include/python3.6m"#python目录
+                         "/usr/include/python3.8"#python目录
+                         "/usr/include/eigen3"
 )
 
 target_link_libraries(open_space_trajectory_optimizer PUBLIC
@@ -13,5 +14,5 @@ target_link_libraries(open_space_trajectory_optimizer PUBLIC
                     configs 
                     coarse_trajectory_generator
                     trajectory_smoother
-                    ${GLOG_LIBRARIES}
+                    #${GLOG_LIBRARIES}
 )

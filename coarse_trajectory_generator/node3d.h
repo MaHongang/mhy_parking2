@@ -78,7 +78,7 @@ private:
   double y_ = 0.0;
   double phi_ = 0.0;
   size_t step_size_ = 1;
-  std::vector<double> traversed_x_;
+  std::vector<double> traversed_x_;//这是什么
   std::vector<double> traversed_y_;
   std::vector<double> traversed_phi_;
   int x_grid_ = 0;

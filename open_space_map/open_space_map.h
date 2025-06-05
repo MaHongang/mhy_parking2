@@ -8,6 +8,8 @@
 #include "common/matplot/matplotlibcpp.h"
 #include "eigen3/Eigen/Dense"
 #include "planning_data/trajectory/discretized_trajectory.h"
+#include "planning_data/trajectory/discretized_trajectory_composition.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -31,24 +33,30 @@ public:
   ~OpenSpaceMap();
 
   void PlotAll();
-
+//set
   void SetXYBounds(double x_min, double x_max, double y_min, double y_max);
   void SetOnebstacle(std::vector<common::math::Vec2d> obstacles_vertices);
   void SetSwellingObstacle(
       std::vector<std::vector<common::math::Vec2d>> swelling_obstacles_vec);
   void SetOptimizedTrajectory(
       DiscretizedTrajectory optimized_trajectory); //轨迹点即可
+  //mhy
+  void SetOptimizedTrajectory(
+       DiscretizedTrajectoryComposition optimized_trajectory); //轨迹点即可
   void SetCoarseTrajectory(DiscretizedTrajectory coarse_trajectory);
+  //mhy
+  void SetCoarseTrajectory(DiscretizedTrajectoryComposition coarse_trajectory);
+  //???f_bound和b_bound是什么
   void SetFrontDrivingBound(Eigen::MatrixXd f_bound);
   void SetBackDrivingBound(Eigen::MatrixXd b_bound);
-
+//get
   const std::vector<std::vector<common::math::Vec2d>>
   obstacles_vertices_vec() const;
   const std::vector<std::vector<common::math::Vec2d>>
   swelling_obstacles_vec() const;
 
   const std::vector<double> XYbounds() const;
-
+//
   void SwellingObstacles(const double &r);
 
   void SwellingObstacle(
@@ -65,11 +73,17 @@ private:
 
   void PlotTrajectory(const DiscretizedTrajectory &trajectory,
                       const std::string &color);
-
+  //mhy
+  void PlotTrajectory(const DiscretizedTrajectoryComposition &trajectory,
+                        const std::string &color);
+//drivingbound是不是就是一个一个方框
   void PlotDrivingBound(const Eigen::MatrixXd bound_);
-
+//V是什么？？？
   void PlotTrajectoryV(const DiscretizedTrajectory &trajectory,
                        const std::string &color);
+                       //mhy
+  void PlotTrajectoryV(const DiscretizedTrajectoryComposition &trajectory,
+                        const std::string &color);
 
 private:
   /* data */
@@ -83,6 +97,8 @@ private:
 
   DiscretizedTrajectory optimized_trajectory_;
   DiscretizedTrajectory coarse_trajectory_;
+  DiscretizedTrajectoryComposition optimized_trajectory_composition_;
+  DiscretizedTrajectoryComposition coarse_trajectory_composition_;
 
   Eigen::MatrixXd f_bound_;
   Eigen::MatrixXd b_bound_;

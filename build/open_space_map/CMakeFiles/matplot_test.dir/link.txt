@@ -1,0 +1,1 @@
+/usr/bin/c++  -fopenmp  -O0 -Wall -g2 -ggdb CMakeFiles/matplot_test.dir/matplot_test.cc.o -o ../bin/matplot_test  /usr/lib/x86_64-linux-gnu/libpython3.8.so 

@@ -18,7 +18,7 @@ int ConstructDrivingCorridor::Construct(
     Eigen::MatrixXd
         *f_bound, // 1.车辆前圆心可行驶边界4*n矩阵,(x_min,x_max,y_min,y_max)'*n
     Eigen::MatrixXd *r_bound) {
-  //膨胀障碍物
+  //膨胀障碍物,为什么要-1.5
   double swelling_r = pow(
       (vehicle_config_.width / 2.0) * (vehicle_config_.width / 4.0) +
           (vehicle_config_.length / 4.0) * (vehicle_config_.length / 4.0) - 1.5,
@@ -26,11 +26,11 @@ int ConstructDrivingCorridor::Construct(
   std::vector<std::vector<common::math::Vec2d>> swelling_obstacles_vec;
   for (const auto &obs : obstacles_vertices_vec) {
     std::vector<common::math::Vec2d> swelling_obstacles_vertices;
-    //膨胀障碍物
+    //膨胀障碍物，为什么要*0.2
     SwellingObstacles(obs, swelling_r * 0.2, &swelling_obstacles_vertices);
     swelling_obstacles_vec.push_back(swelling_obstacles_vertices);
   }
-
+//为什么要多一行？？？
   swelling_obstacles_vec = swelling_obstacles_vec;
   swelling_obstacles_vec_ = swelling_obstacles_vec;
   //路径点重采样？？是否需要，暂且不写
@@ -72,7 +72,8 @@ int ConstructDrivingCorridor::Construct(
     (*f_bound).block(0, i, 4, 1) = driving_bound_fbox;
     (*r_bound).block(0, i, 4, 1) = driving_bound_bbox;
   }
-
+//mhy
+return 0;
   //生产局部矩形
 }
 
@@ -179,7 +180,7 @@ void ConstructDrivingCorridor::GenerateDrivingBoundBox(
 /*障碍物检测的方法有
     1.外接圆
     2.AABB 与坐标值平行的包围盒
-    3.SAT 分离轴
+    3.SAT 分离轴 精确碰撞还是选用sat
     4.OBB
     5.GJK  EPA
     6.比较面积法
@@ -198,6 +199,7 @@ int ConstructDrivingCorridor::CollisionCheck(
     std::vector<double> bounding_box_driving;
     std::vector<double> bounding_box_obs;
     // x_max,y_max,x_min,y_min逆时针增加
+    //bounding_box_driving可以替换为    AABB_ego
     BuildBoundingBox(driving_box_vertices, &bounding_box_driving);
     BuildBoundingBox(convex_polygon_vertices, &bounding_box_obs);
 
@@ -268,7 +270,7 @@ int ConstructDrivingCorridor::CollisionCheck(
 
         for (const auto &driving_box_vertice :
              driving_box_vertices) //将可行驶框投影到投影轴，并按照x排序
-        {
+      {        
           double project = project_axis.InnerProd(driving_box_vertice);
           box_projects.push_back(project);
           if (project > box_x_max)
@@ -299,6 +301,7 @@ int ConstructDrivingCorridor::CollisionCheck(
     return 1;
   }
 }
+//计算多边形的轴对齐包围盒（AABB）
 void ConstructDrivingCorridor::BuildBoundingBox(
     const std::vector<common::math::Vec2d> &polygon_vertices,
     std::vector<double> *bounding_box) { //{x_max,y_max,x_min,y_min}
@@ -330,3 +333,4 @@ std::vector<std::vector<common::math::Vec2d>>
 ConstructDrivingCorridor::swelling_obstacles_vec() {
   return swelling_obstacles_vec_;
 }
+

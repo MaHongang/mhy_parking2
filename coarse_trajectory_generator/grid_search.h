@@ -52,7 +52,7 @@ public:
   }
   void SetPathCost(const double path_cost) {
     path_cost_ = path_cost;
-    cost_ = path_cost_ + heuristic_;
+    cost_ = path_cost_ + heuristic_;//更新g的同时，更新f   f=g+h
   }
   void SetHeuristic(const double heuristic) {
     heuristic_ = heuristic;
@@ -60,7 +60,7 @@ public:
   }
   void SetCost(const double cost) { cost_ = cost; }
   void SetPreNode(std::shared_ptr<Node2d> pre_node) { pre_node_ = pre_node; }
-  double GetGridX() const { return grid_x_; }
+  double GetGridX() const { return grid_x_; }//为什么返回值类型为double
   double GetGridY() const { return grid_y_; }
   double GetPathCost() const { return path_cost_; }
   double GetHeuCost() const { return heuristic_; }
@@ -76,7 +76,7 @@ public:
     return ComputeStringIndex(grid_x, grid_y);
   }
   bool operator==(const Node2d &right) const {
-    return right.GetIndex() == index_;
+    return right.GetIndex() == index_;//重载== 定义两个节点相等/相同
   }
 
 private:
@@ -85,11 +85,12 @@ private:
   }
 
 private:
+//可以拓展为 f=g+a*h
   int grid_x_ = 0;
   int grid_y_ = 0;
-  double path_cost_ = 0.0;
-  double heuristic_ = 0.0;
-  double cost_ = 0.0;
+  double path_cost_ = 0.0;//g
+  double heuristic_ = 0.0;//h
+  double cost_ = 0.0;//f
   std::string index_;
   std::shared_ptr<Node2d> pre_node_ = nullptr;
 };
@@ -97,10 +98,10 @@ private:
 struct GridAStartResult {
   std::vector<double> x;
   std::vector<double> y;
-  double path_cost = 0.0;
+  double path_cost = 0.0;//实际距离的估计
 };
 
-class GridSearch {
+class GridSearch { 
 public:
   explicit GridSearch(const PlannerOpenSpaceConfig &open_space_conf);
   virtual ~GridSearch() = default;
@@ -108,31 +109,31 @@ public:
   GenerateAStarPath(const double sx, const double sy, const double ex,
                     const double ey, const std::vector<double> &XYbounds,
                     const std::vector<std::vector<common::math::LineSegment2d>>
-                        &obstacles_linesegments_vec,
+                        &obstacles_linesegments_vec,//是否有线段表示的障碍物和顶点表示障碍物相互转换的函数
                     GridAStartResult *result);
   bool GenerateDpMap(const double ex, const double ey,
                      const std::vector<double> &XYbounds,
                      const std::vector<std::vector<common::math::LineSegment2d>>
-                         &obstacles_linesegments_vec);
-  double CheckDpMap(const double sx, const double sy);
+                         &obstacles_linesegments_vec);//dpmap的作用是什么 没明白 动态规划思想？？？
+  double CheckDpMap(const double sx, const double sy);//checkdpmap是否是用来查表的
 
 private:
   double EuclidDistance(const double x1, const double y1, const double x2,
                         const double y2);
   std::vector<std::shared_ptr<Node2d>>
   GenerateNextNodes(std::shared_ptr<Node2d> node);
-  bool CheckConstraints(std::shared_ptr<Node2d> node);
-  void LoadGridAStarResult(GridAStartResult *result);
+  bool CheckConstraints(std::shared_ptr<Node2d> node);//用来边界检测和障碍物检测吗
+  void LoadGridAStarResult(GridAStartResult *result);//将搜索节点保存为 GridAStartResult
 
 private:
   double xy_grid_resolution_ = 0.0;
-  double node_radius_ = 0.0;
+  double node_radius_ = 0.0;//
   std::vector<double> XYbounds_;
-  double max_grid_x_ = 0.0;
+  double max_grid_x_ = 0.0;//使用xybounds_和resolution来计算吗
   double max_grid_y_ = 0.0;
   std::shared_ptr<Node2d> start_node_;
   std::shared_ptr<Node2d> end_node_;
-  std::shared_ptr<Node2d> final_node_;
+  std::shared_ptr<Node2d> final_node_;//final_node_和end_node_ final_node_最后一个探索点
   std::vector<std::vector<common::math::LineSegment2d>>
       obstacles_linesegments_vec_;
 
@@ -140,7 +141,8 @@ private:
     bool operator()(const std::pair<std::string, double> &left,
                     const std::pair<std::string, double> &right) const {
       return left.second >= right.second;
-    }
+    }//自定义比较器结构体，用于降序排列
   };
   std::unordered_map<std::string, std::shared_ptr<Node2d>> dp_map_;
 };
+ 

@@ -1,4 +1,4 @@
-/******************************************************************************
+ /******************************************************************************
  * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -59,6 +59,7 @@ bool DistanceApproachProblem::Solve(
   } else if (planner_open_space_config_.distance_approach_config
                  .distance_approach_mode ==
              "DISTANCE_APPROACH_CORRIDOR_IPOPT") {
+              std::cout << "DISTANCE_APPROACH_CORRIDOR_IPOPT模式" << std::endl;          
     ptop = new DistanceApproachIPOPTCorridorInterface(
         horizon, ds_init, ego, xWS, uWS, x0, xF, last_time_u, XYbounds,
         obstacles_edges_num, obstacles_num, f_driving_bound, b_driving_bound,
@@ -74,13 +75,13 @@ bool DistanceApproachProblem::Solve(
       "print_level", planner_open_space_config_.distance_approach_config
                          .ipopt_config.ipopt_print_level);
   // zhaokun20221013参数未设置
-  app->Options()->SetIntegerValue(
-      "mumps_mem_percent", planner_open_space_config_.distance_approach_config
-                               .ipopt_config.mumps_mem_percent);
+  // app->Options()->SetIntegerValue(
+  //     "mumps_mem_percent", planner_open_space_config_.distance_approach_config
+  //                              .ipopt_config.mumps_mem_percent);
   // zhaokun20221013参数未设置
-  app->Options()->SetNumericValue(
-      "mumps_pivtol", planner_open_space_config_.distance_approach_config
-                          .ipopt_config.mumps_pivtol);
+  //app->Options()->SetNumericValue(
+      // "mumps_pivtol", planner_open_space_config_.distance_approach_config
+      //                     .ipopt_config.mumps_pivtol);
   app->Options()->SetIntegerValue(
       "max_iter", planner_open_space_config_.distance_approach_config
                       .ipopt_config.ipopt_max_iter);

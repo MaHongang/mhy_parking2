@@ -37,7 +37,7 @@ bool GridSearch::CheckConstraints(std::shared_ptr<Node2d> node) {
   if (node_grid_x > max_grid_x_ || node_grid_x < 0 ||
       node_grid_y > max_grid_y_ || node_grid_y < 0) {
     return false;
-  }
+  }//边界检测
   if (obstacles_linesegments_vec_.empty()) {
     return true;
   }
@@ -45,11 +45,11 @@ bool GridSearch::CheckConstraints(std::shared_ptr<Node2d> node) {
     for (const common::math::LineSegment2d &linesegment :
          obstacle_linesegments) {
       if (linesegment.DistanceTo({node->GetGridX(), node->GetGridY()}) <
-          node_radius_) {
+          node_radius_) {//线段归一化了吗？？？
         return false;
       }
     }
-  }
+  }//这个障碍物避障检测真的没问题吗？？？
   return true;
 }
 //扩展节点并计算其cost
@@ -59,13 +59,13 @@ GridSearch::GenerateNextNodes(std::shared_ptr<Node2d> current_node) {
   double current_node_y = current_node->GetGridY();
   double current_node_path_cost = current_node->GetPathCost();
   double diagonal_distance = std::sqrt(2.0); //对角线距离根号2
-  std::vector<std::shared_ptr<Node2d>> next_nodes;
+  std::vector<std::shared_ptr<Node2d>> next_nodes;//顺时针扩展8个点
   std::shared_ptr<Node2d> up =
       std::make_shared<Node2d>(current_node_x, current_node_y + 1.0, XYbounds_);
   up->SetPathCost(current_node_path_cost + 1.0);
   std::shared_ptr<Node2d> up_right = std::make_shared<Node2d>(
       current_node_x + 1.0, current_node_y + 1.0, XYbounds_);
-  up_right->SetPathCost(current_node_path_cost + diagonal_distance);
+  up_right->SetPathCost(current_node_path_cost + diagonal_distance);//
   std::shared_ptr<Node2d> right =
       std::make_shared<Node2d>(current_node_x + 1.0, current_node_y, XYbounds_);
   right->SetPathCost(current_node_path_cost + 1.0);
@@ -103,23 +103,23 @@ bool GridSearch::GenerateAStarPath(
         &obstacles_linesegments_vec,
     GridAStartResult *result) {
   std::priority_queue<std::pair<std::string, double>,
-                      std::vector<std::pair<std::string, double>>, cmp>
+                      std::vector<std::pair<std::string, double>>, cmp>//对总代价降序排列，注意比较器的用法
       open_pq;
-  std::unordered_map<std::string, std::shared_ptr<Node2d>> open_set;
+  std::unordered_map<std::string, std::shared_ptr<Node2d>> open_set;//索引和节点指针
   std::unordered_map<std::string, std::shared_ptr<Node2d>> close_set;
   XYbounds_ = XYbounds;
   std::shared_ptr<Node2d> start_node =
       std::make_shared<Node2d>(sx, sy, xy_grid_resolution_, XYbounds_); //起点
   std::shared_ptr<Node2d> end_node =
       std::make_shared<Node2d>(ex, ey, xy_grid_resolution_, XYbounds_); //终点
-  std::shared_ptr<Node2d> final_node_ = nullptr;
+  std::shared_ptr<Node2d> final_node_ = nullptr;//final_node_不一定与end_node_完全相同是吧
   obstacles_linesegments_vec_ =
       obstacles_linesegments_vec; //参数转为私有变量是为了让类中可以使用该变量
   open_set.emplace(start_node->GetIndex(),
                    start_node); // unorderer_map(x_y索引,node2d node)
   open_pq.emplace(start_node->GetIndex(),
-                  start_node->GetCost()); //(string,double)
-
+                  start_node->GetCost()); //pair (string,double)
+ //open_set 储存索引和节点指针 open_pq储存索引和路径代价
   // Grid a star begins
   size_t explored_node_num = 0;
   while (!open_pq.empty()) {
@@ -127,19 +127,19 @@ bool GridSearch::GenerateAStarPath(
     open_pq.pop();
     std::shared_ptr<Node2d> current_node = open_set[current_id];
     // Check destination是否到达终点
-    if (*(current_node) == *(end_node)) {
+    if (*(current_node) == *(end_node)) { //自定义==
       final_node_ = current_node;
       break;
     }
     close_set.emplace(current_node->GetIndex(), current_node);
     std::vector<std::shared_ptr<Node2d>> next_nodes =
-        std::move(GenerateNextNodes(current_node));
+        std::move(GenerateNextNodes(current_node));//std::move
     for (auto &next_node : next_nodes) {
       if (!CheckConstraints(next_node)) {
         continue;
       }
       if (close_set.find(next_node->GetIndex()) != close_set.end()) {
-        continue;
+        continue;//闭集已经包含
       }
       if (open_set.find(next_node->GetIndex()) == open_set.end()) {
         ++explored_node_num;
@@ -150,6 +150,20 @@ bool GridSearch::GenerateAStarPath(
         open_set.emplace(next_node->GetIndex(), next_node);
         open_pq.emplace(next_node->GetIndex(), next_node->GetCost());
       }
+      //为什么不考虑next_node已经被开集包含的情况，是因为概率很小吗
+      // if (open_set.find(next_node->GetIndex()) != open_set.end())
+      // {
+      //   if(next_node->GetPathCost()> EuclidDistance(next_node->GetGridX(), next_node->GetGridY(),
+      //   current_node->GetGridX(), current_node->GetGridY())
+      //   +current_node->GetPathCost())
+      //   {
+      //     next_node->SetPreNode(current_node);
+      //     next_node->SetPathCost(EuclidDistance(next_node->GetGridX(), next_node->GetGridY(),
+      //     current_node->GetGridX(), current_node->GetGridY())
+      //     +current_node->GetPathCost());
+      //   }
+
+      // }
     }
   }
 
@@ -159,7 +173,7 @@ bool GridSearch::GenerateAStarPath(
     return false;
   }
   LoadGridAStarResult(result);
-  std::cout << "explored node num is " << explored_node_num;
+  std::cout << "explored node num is " << explored_node_num << std::endl;
   return true;
 }
 //主要
@@ -219,7 +233,7 @@ bool GridSearch::GenerateDpMap(
   return true;
 }
 
-double GridSearch::CheckDpMap(const double sx, const double sy) {
+double GridSearch::CheckDpMap(const double sx, const double sy) {//查表
   std::string index = Node2d::CalcIndex(sx, sy, xy_grid_resolution_, XYbounds_);
   if (dp_map_.find(index) != dp_map_.end()) {
     return dp_map_[index]->GetCost() * xy_grid_resolution_;

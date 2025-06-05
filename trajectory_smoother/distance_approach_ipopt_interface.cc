@@ -1791,7 +1791,8 @@ void DistanceApproachIPOPTInterface::eval_constraints(int n, const T *x, int m,
 }
 
 bool DistanceApproachIPOPTInterface::check_g(int n, const double *x, int m,
-                                             const double *g) {
+                                             const double *g) 
+                                             {
   int kN = n;
   int kM = m;
   double x_u_tmp[kN];

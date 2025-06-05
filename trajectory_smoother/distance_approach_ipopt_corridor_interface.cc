@@ -186,7 +186,7 @@ bool DistanceApproachIPOPTCorridorInterface::get_bounds_info(int n, double *x_l,
     variable_index += 4;
   }
 
-  // end point pose
+  // end point pose 0.1 0.2是什么作用，松弛吗？？？
   x_l[variable_index] = xf_(0, 0) - 0.1;
   x_u[variable_index] = xf_(0, 0) + 0.1;
   x_l[variable_index + 1] = xf_(1, 0) - 0.1;
@@ -220,7 +220,7 @@ bool DistanceApproachIPOPTCorridorInterface::get_bounds_info(int n, double *x_l,
 
   // g_l
   // Constraints: includes four state Euler forward constraints, three
-  // 1. dynamics constraints 4 * [0, horizons-1]
+  // 1. dynamics constraints 4 * [0, horizons-1] f(x,u)=0实际是四个方程
   int constraint_index = 0;
   for (int i = 0; i < 4 * horizon_; ++i) {
     g_l[i] = 0.0;
@@ -403,7 +403,8 @@ bool DistanceApproachIPOPTCorridorInterface::eval_jac_g(int n, const double *x,
 
 bool DistanceApproachIPOPTCorridorInterface::eval_jac_g_ser(
     int n, const double *x, bool new_x, int m, int nele_jac, int *iRow,
-    int *jCol, double *values) {
+    int *jCol, double *values)
+     {
   std::cout << "eval_jac_g" << std::endl;
   // CHECK_EQ(n, num_of_variables_)
   //     << "No. of variables wrong in eval_jac_g. n : " << n;

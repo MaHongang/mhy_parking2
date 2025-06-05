@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../lib/libconfigs.a CMakeFiles/configs.dir/open_space_trajectory_optimizer_config.cc.o
+/usr/bin/ranlib ../lib/libconfigs.a

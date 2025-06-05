@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../lib/libplanning_data.a CMakeFiles/planning_data.dir/path/discretized_path.cc.o CMakeFiles/planning_data.dir/speed/speed_data.cc.o CMakeFiles/planning_data.dir/trajectory/discretized_trajectory.cc.o CMakeFiles/planning_data.dir/piecewise_jerk/piecewise_jerk_problem.cc.o CMakeFiles/planning_data.dir/piecewise_jerk/piecewise_jerk_speed_problem.cc.o
+/usr/bin/ranlib ../lib/libplanning_data.a

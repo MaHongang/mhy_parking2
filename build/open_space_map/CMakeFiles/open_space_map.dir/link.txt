@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../lib/libopen_space_map.a CMakeFiles/open_space_map.dir/open_space_map.cc.o
+/usr/bin/ranlib ../lib/libopen_space_map.a

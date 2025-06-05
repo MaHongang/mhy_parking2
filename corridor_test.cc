@@ -1,5 +1,6 @@
 #include "common/math/vec2d.h"
 #include "common/pnc_point.h"
+#include "common/matplot/matplotlibcpp.h"
 #include "configs/open_space_trajectory_optimizer_config.h"
 #include "configs/vehicle_config.h"
 #include "open_space_map/open_space_map.h"
@@ -7,10 +8,13 @@
 #include "trajectory_smoother/construct_driving_corridor.h"
 #include <memory>
 #include <vector>
+#include "coarse_trajectory_generator/hybrid_a_star.h"
 
 using namespace common::math;
-int main() {
+namespace plt = matplotlibcpp;
 
+int main() {
+  
   std::cout << "hello" << std::endl;
 
   //设置地图边界
@@ -66,6 +70,24 @@ int main() {
   std::unique_ptr<ConstructDrivingCorridor> cor =
       std::make_unique<ConstructDrivingCorridor>(open_space_config,
                                                  vehicle_config);
+  //
+  std::unique_ptr<HybridAStar> hybrid_a_star_ = std::make_unique<HybridAStar>(open_space_config);
+
+  
+  HybridAStartResult result;
+  double xs=70;
+  double ys=70;
+  double thes=0;
+  double xe=80;
+  double ye=80;
+  double thee=0;
+  std::vector<double> XYbounds_={0,100,0,100};
+  std::vector<std::vector<common::math::Vec2d>> obstacles_vertices_vec_2;
+  hybrid_a_star_->Plan(xs,ys,thes,xe,ye,thee,XYbounds_,obstacles_vertices_vec_2,&result);
+  plt::plot(result.x,result.y,"red");
+  plt::show(); 
+
+  // int n=result->x.size();
 
   Eigen::MatrixXd xWS = Eigen::MatrixXd::Zero(4, 1);
   xWS << 33, 42, 1.6, 0;
@@ -80,7 +102,8 @@ int main() {
       &b_bound);
 
   map->SetSwellingObstacle(cor->swelling_obstacles_vec());
-
+ // DiscretizedTrajectory coarse_trajectory={{}}
+  //map->SetCoarseTrajectory(coarse_trajectory);
   map->SetFrontDrivingBound(f_bound);
   map->SetBackDrivingBound(b_bound);
   map->PlotAll();

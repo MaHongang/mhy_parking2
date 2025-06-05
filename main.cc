@@ -5,6 +5,7 @@
 #include "open_space_trajectory_optimizer/open_space_trajectory_optimizer.h"
 #include <memory>
 #include <vector>
+#include <iostream>
 
 using namespace common::math;
 int main() {

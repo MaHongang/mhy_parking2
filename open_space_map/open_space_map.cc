@@ -8,16 +8,16 @@ void OpenSpaceMap::PlotAll() {
 
   // PlotSwellingObstacles(swelling_obstacles_vec_);
 
-  PlotTrajectory(coarse_trajectory_, "k");
+  PlotTrajectory(coarse_trajectory_composition_, "k");
 
   PlotDrivingBound(f_bound_);
-  // PlotDrivingBound(b_bound_);
+   PlotDrivingBound(b_bound_);
 
-  PlotTrajectory(optimized_trajectory_, "b");
+  PlotTrajectory(optimized_trajectory_composition_, "b");
 
   plt::figure(2);
-  PlotTrajectoryV(coarse_trajectory_, "k");
-  PlotTrajectoryV(optimized_trajectory_, "b");
+  PlotTrajectoryV(coarse_trajectory_composition_, "k");
+  PlotTrajectoryV(optimized_trajectory_composition_, "b");
 
   plt::show(); // plot::show()是一个阻塞函数
 }
@@ -37,10 +37,18 @@ void OpenSpaceMap::SetOptimizedTrajectory(
     DiscretizedTrajectory optimized_trajectory) {
   optimized_trajectory_ = optimized_trajectory;
 }
+void OpenSpaceMap::SetOptimizedTrajectory(
+  DiscretizedTrajectoryComposition optimized_trajectory) {
+optimized_trajectory_composition_ = optimized_trajectory;
+}
 //轨迹点即可
 void OpenSpaceMap::SetCoarseTrajectory(
     DiscretizedTrajectory coarse_trajectory) {
   coarse_trajectory_ = coarse_trajectory;
+}
+void OpenSpaceMap::SetCoarseTrajectory(
+  DiscretizedTrajectoryComposition coarse_trajectory) {
+coarse_trajectory_composition_= coarse_trajectory;
 }
 
 const std::vector<std::vector<common::math::Vec2d>>
@@ -59,7 +67,7 @@ void OpenSpaceMap::PlotObstacles(
       y.push_back(obs_vertice.y());
     }
     std::map<std::string, std::string> keywords;
-    keywords["color"] = "grey";
+    keywords["color"] = "black";
     plt::fill(x, y, keywords);
   }
 }
@@ -92,9 +100,24 @@ void OpenSpaceMap::PlotTrajectory(const DiscretizedTrajectory &trajectory,
 
   plt::plot(x, y, color);
 }
+void OpenSpaceMap::PlotTrajectory(const DiscretizedTrajectoryComposition &trajectory,
+  const std::string &color) {
+
+std::vector<double> x, y;
+std::vector<common::TrajectoryPoint> trajectory_=trajectory.GetDiscretizedTrajectory();
+for (const auto point : trajectory_) {
+x.push_back(point.path_point().x());
+y.push_back(point.path_point().y());
+}
+
+plt::plot(x, y, color);
+}
+
 
 void OpenSpaceMap::PlotDrivingBound(const Eigen::MatrixXd bound_) {
   //(x_min,x_max,y_min,y_max)
+  //记录一个矩形只需要4个值
+  //bound_的每一列都是4个值
 
   int size = bound_.cols();
   for (int i = 0; i < size; i++) {
@@ -116,9 +139,9 @@ void OpenSpaceMap::PlotDrivingBound(const Eigen::MatrixXd bound_) {
     x.push_back(bound_(0, i));
     y.push_back(bound_(2, i));
 
-    if ((i % 20) == 0) {
+     
       plt::plot(x, y);
-    }
+    
   }
 }
 
@@ -187,7 +210,7 @@ const std::vector<std::vector<common::math::Vec2d>>
 OpenSpaceMap::swelling_obstacles_vec() const {
   return swelling_obstacles_vec_;
 }
-
+//???
 void OpenSpaceMap::PlotTrajectoryV(const DiscretizedTrajectory &trajectory,
                                    const std::string &color) {
 
@@ -197,4 +220,15 @@ void OpenSpaceMap::PlotTrajectoryV(const DiscretizedTrajectory &trajectory,
     y.push_back(point.v());
   }
   plt::plot(x, y, color);
+}
+void OpenSpaceMap::PlotTrajectoryV(const DiscretizedTrajectoryComposition &trajectory,
+  const std::string &color) {
+
+std::vector<double> x, y;
+std::vector<common::TrajectoryPoint> trajectory_=trajectory.GetDiscretizedTrajectory();
+for (const auto point : trajectory_) {
+x.push_back(point.relative_time());
+y.push_back(point.v());
+}
+plt::plot(x, y, color);
 }

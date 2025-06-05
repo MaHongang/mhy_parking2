@@ -38,10 +38,10 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig &open_space_conf)
   max_steer_angle_ =
       vehicle_param_.max_steer_angle / vehicle_param_.steer_ratio;
   step_size_ =
-      planner_open_space_config_.warm_start_config.step_size; //行驶步长
+      planner_open_space_config_.warm_start_config.step_size; //行驶步长???是一个节点的长度吗 md有两个step_size,一个是步长长度，一个是步长数量
   xy_grid_resolution_ =
       planner_open_space_config_.warm_start_config.xy_grid_resolution;
-  delta_t_ = planner_open_space_config_.warm_start_config.delta_t;
+  delta_t_ = planner_open_space_config_.warm_start_config.delta_t;//求速度的dt
   traj_forward_penalty_ =
       planner_open_space_config_.warm_start_config.traj_forward_penalty;
   traj_back_penalty_ =
@@ -57,6 +57,8 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig &open_space_conf)
 bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node) {
   std::shared_ptr<ReedSheppPath> reeds_shepp_to_check =
       std::make_shared<ReedSheppPath>();
+      
+
   if (!reed_shepp_generator_->ShortestRSP(
           current_node, end_node_,
           reeds_shepp_to_check)) { //搜寻最短的RS路径
@@ -139,7 +141,7 @@ std::shared_ptr<Node3d> HybridAStar::LoadRSPinCS(
       reeds_shepp_to_end->x, reeds_shepp_to_end->y, reeds_shepp_to_end->phi,
       XYbounds_, planner_open_space_config_));
   end_node->SetPre(current_node); // end_node的父节点设置为当前节点
-  close_set_.emplace(end_node->GetIndex(), end_node);
+  close_set_.emplace(end_node->GetIndex(), end_node);//结束了,放不放都无所谓吧
   return end_node;
 }
 // 3D，邻域点生成
@@ -157,12 +159,12 @@ HybridAStar::Next_node_generator(std::shared_ptr<Node3d> current_node,
   //即，把[-max_steer_angle_, max_steer_angle_]分为（next_node_num_/2-1）份
   //所以，steering = 初始偏移量 + 单位间隔 × index
 
-  if (next_node_index < static_cast<double>(next_node_num_) / 2) { //正向，前5
+  if (next_node_index < static_cast<double>(next_node_num_) / 2) { //正向，前5//next_node_index是不是从0开始 使用时是的
     steering =
         -max_steer_angle_ +
         (2 * max_steer_angle_ / (static_cast<double>(next_node_num_) / 2 - 1)) *
             static_cast<double>(next_node_index);
-    traveled_distance = step_size_;
+    traveled_distance = step_size_; // step_size_ 默认0.25，是每次向前运动的距离,为什么这个step是通过配置文件写死的，不是应该为 v*dt 吗？
   } else { //反向，后5
     size_t index = next_node_index - next_node_num_ / 2;
     steering =
@@ -175,18 +177,18 @@ HybridAStar::Next_node_generator(std::shared_ptr<Node3d> current_node,
   // different grid按照上面的运动方向，将车辆行驶向不同的栅格
   double arc =
       std::sqrt(2) *
-      xy_grid_resolution_; // arc是根号2倍的栅格分辨率，根号（2）的栅格分辨率，一定能到下一个栅格
+      xy_grid_resolution_; // arc是根号2倍的栅格分辨率，根号（2）的栅格分辨率，一定能到下一个栅格 1.4*0.4
   std::vector<double> intermediate_x;
   std::vector<double> intermediate_y;
   std::vector<double> intermediate_phi;
   double last_x = current_node->GetX();
   double last_y = current_node->GetY();
   double last_phi = current_node->GetPhi();
-  intermediate_x.push_back(last_x);
+  intermediate_x.push_back(last_x);//每个节点的第一个值是上一个节点的最后一个值
   intermediate_y.push_back(last_y);
   intermediate_phi.push_back(last_phi);
-  for (size_t i = 0; i < arc / step_size_;
-       ++i) { //寻找行走超过>栅格根号2倍的距离的作为next_node
+  for (size_t i = 0; i < arc / step_size_;//实际上，一个节点就只包含一个离散点？？？不是
+       ++i) { //寻找行走超过>栅格根号2倍的距离的作为next_node 运动学公式扩展的不是节点，而是节点包含的离散点，
     const double next_x = last_x + traveled_distance * std::cos(last_phi);
     const double next_y = last_y + traveled_distance * std::sin(last_phi);
     const double next_phi = common::math::NormalizeAngle(
@@ -210,7 +212,7 @@ HybridAStar::Next_node_generator(std::shared_ptr<Node3d> current_node,
       new Node3d(intermediate_x, intermediate_y, intermediate_phi, XYbounds_,
                  planner_open_space_config_));
   next_node->SetPre(current_node);
-  next_node->SetDirec(traveled_distance > 0.0);
+  next_node->SetDirec(traveled_distance > 0.0);//什么意思  判断行驶方向的
   next_node->SetSteer(steering);
   return next_node;
 }
@@ -233,7 +235,7 @@ double HybridAStar::TrajCost(std::shared_ptr<Node3d> current_node,
   double piecewise_cost = 0.0;
   if (next_node->GetDirec()) {
     piecewise_cost += static_cast<double>(next_node->GetStepSize() - 1) *
-                      step_size_ * traj_forward_penalty_;
+                      step_size_ * traj_forward_penalty_;//为什么要-1 // 步长个数*步长长度
   } else {
     piecewise_cost += static_cast<double>(next_node->GetStepSize() - 1) *
                       step_size_ * traj_back_penalty_;
@@ -314,6 +316,7 @@ bool HybridAStar::GetResult(HybridAStartResult *result) {
   }
   return true;
 }
+//差分求速度，加速度
 
 bool HybridAStar::GenerateSpeedAcceleration(HybridAStartResult *result) {
   // Sanity Check
@@ -327,6 +330,7 @@ bool HybridAStar::GenerateSpeedAcceleration(HybridAStartResult *result) {
   // load velocity from position
   // initial and end speed are set to be zeros
   result->v.push_back(0.0);
+  //下面这个公式是什么？？？
   for (size_t i = 1; i + 1 < x_size; ++i) {
     double discrete_v = (((result->x[i + 1] - result->x[i]) / delta_t_) *
                              std::cos(result->phi[i]) +
@@ -416,6 +420,7 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult *result) {
 
   // TODO(Jinyun): explore better time horizon heuristic
   const double path_length = result->accumulated_s.back();
+  //什么公式？？？
   const double total_t = std::max(gear ? 1.5 *
                                              (max_forward_v * max_forward_v +
                                               path_length * max_forward_acc) /
@@ -714,12 +719,32 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
     return false;
   }
   // 4.生成动态规划代价地图，以终点为搜索起点，遍历整个地图计算各个点到终点的代价。
+  // f = g + h，在apollo中变量名称是：
+  // cost_ = path_cost_ + heuristic_
+  // 使用djkstra算法来计算目标点到图中任一点的path_cost
+  // 相当于把地图里每个点都跑了一遍，知道了到每个点的距离
+  // 为什么不用经典A*呢，因为经典A*适合点到点的最短距离，
+  // 想起点到所有点的距离，用dijkstra更合适
+  // dijkstra相当与把经典A*中 f=g+h中的h设为0，也就是不启发
+  // 生成一个dp_map,这里的dp是动态规划的意思。这个dp_map是一个unordered map
+  // 里面记录了一个二维网格地图中所有的格子，也就是所有节点，每一个节点上都有
+  // 它到终点的path_cost，后续只需要查表，空间换时间
+
+
   double map_time = clock();
   //
   grid_a_star_heuristic_generator_->GenerateDpMap(ex, ey, XYbounds_,
                                                   obstacles_linesegments_vec_);
   std::cout << "map time " << clock() - map_time << std::endl;
+ 
   // load open set, pq5.载入起点至open_set、open_pq
+  // load open set, pq
+  // 用emplace比push效率高，并且用push的话，需要写成 make_pair(next_node->GetIndex(), next_node)，多一个make_pair
+  // open_set_是一个unordered_map的类型，用这个是因为这种键值对的形式比较方便，不需要排序所以用unordered可能节省资源。
+  // open_pq_现在是pq的类型，主要是要有序这个特性。虽然set也可以有序，但是pq比set快，set多了一个唯一的属性
+  // open_pq_的排序规则是自定义的，是按cost排序的
+
+
   open_set_.emplace(start_node_->GetIndex(), start_node_);
   open_pq_.emplace(start_node_->GetIndex(), start_node_->GetCost());
 
@@ -728,7 +753,6 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
   double astar_start_time = clock();
   double heuristic_time = 0.0;
   double rs_time = 0.0;
-
   while (!open_pq_.empty()) {
     // take out the lowest cost neighboring node
     const std::string current_id = open_pq_.top().first; //取代价最小的相邻节点
@@ -738,9 +762,12 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
     // configuration to the end configuration without collision. if so, search
     // ends.如果有一条RS曲线连接当前点和终点无碰撞，那么终止搜索
     const double rs_start_time = clock();
+
     if (AnalyticExpansion(current_node)) {
       break;
     }
+    
+
     const double rs_end_time = clock();
     rs_time += rs_end_time - rs_start_time;
     //将当前节点放入close_set
@@ -749,7 +776,7 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
     for (size_t i = 0; i < next_node_num_; ++i) { // 10个方向扩展，上5下5
       //以不同方向，向前行驶根号2倍的栅格分辨率向前行进
       std::shared_ptr<Node3d> next_node =
-          Next_node_generator(current_node, i); //生成下一个节点
+          Next_node_generator(current_node, i); //生成下一个节点  
       // boundary check failure handle
       if (next_node == nullptr) {
         continue; //超出边界，跳过
@@ -778,16 +805,20 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
                 ->GetCost()); //邻接节点放入open_pq优先队列，open_pq只比open_set少了最优点
       }
     }
+    
+
   }
   if (final_node_ == nullptr) {
     std::cout << "Hybrid A searching return null ptr(open_set ran out)"
               << std::endl;
     return false;
   }
+
   if (!GetResult(result)) {
     std::cout << "GetResult failed" << std::endl;
     return false;
   }
+  
   std::cout << "explored node num is " << explored_node_num << std::endl;
   std::cout << "heuristic time is " << heuristic_time << std::endl;
   std::cout << "reed shepp time is " << rs_time << std::endl;

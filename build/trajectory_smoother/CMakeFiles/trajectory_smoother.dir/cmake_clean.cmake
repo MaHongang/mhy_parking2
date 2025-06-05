@@ -1,0 +1,33 @@
+file(REMOVE_RECURSE
+  "../lib/libtrajectory_smoother.a"
+  "../lib/libtrajectory_smoother.pdb"
+  "CMakeFiles/trajectory_smoother.dir/construct_driving_corridor.cc.o"
+  "CMakeFiles/trajectory_smoother.dir/construct_driving_corridor.cc.o.d"
+  "CMakeFiles/trajectory_smoother.dir/distance_approach_apollo_problem.cc.o"
+  "CMakeFiles/trajectory_smoother.dir/distance_approach_apollo_problem.cc.o.d"
+  "CMakeFiles/trajectory_smoother.dir/distance_approach_ipopt_corridor_interface.cc.o"
+  "CMakeFiles/trajectory_smoother.dir/distance_approach_ipopt_corridor_interface.cc.o.d"
+  "CMakeFiles/trajectory_smoother.dir/distance_approach_ipopt_interface.cc.o"
+  "CMakeFiles/trajectory_smoother.dir/distance_approach_ipopt_interface.cc.o.d"
+  "CMakeFiles/trajectory_smoother.dir/distance_approach_ipopt_relax_end_interface.cc.o"
+  "CMakeFiles/trajectory_smoother.dir/distance_approach_ipopt_relax_end_interface.cc.o.d"
+  "CMakeFiles/trajectory_smoother.dir/distance_approach_ipopt_relax_end_slack_interface.cc.o"
+  "CMakeFiles/trajectory_smoother.dir/distance_approach_ipopt_relax_end_slack_interface.cc.o.d"
+  "CMakeFiles/trajectory_smoother.dir/distance_approach_problem.cc.o"
+  "CMakeFiles/trajectory_smoother.dir/distance_approach_problem.cc.o.d"
+  "CMakeFiles/trajectory_smoother.dir/dual_variable_warm_start_osqp_interface.cc.o"
+  "CMakeFiles/trajectory_smoother.dir/dual_variable_warm_start_osqp_interface.cc.o.d"
+  "CMakeFiles/trajectory_smoother.dir/dual_variable_warm_start_problem.cc.o"
+  "CMakeFiles/trajectory_smoother.dir/dual_variable_warm_start_problem.cc.o.d"
+  "CMakeFiles/trajectory_smoother.dir/iterative_anchoring_smoother.cc.o"
+  "CMakeFiles/trajectory_smoother.dir/iterative_anchoring_smoother.cc.o.d"
+  "CMakeFiles/trajectory_smoother.dir/minimum_jerk_problem.cc.o"
+  "CMakeFiles/trajectory_smoother.dir/minimum_jerk_problem.cc.o.d"
+  "CMakeFiles/trajectory_smoother.dir/open_space_roi_deal.cc.o"
+  "CMakeFiles/trajectory_smoother.dir/open_space_roi_deal.cc.o.d"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/trajectory_smoother.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

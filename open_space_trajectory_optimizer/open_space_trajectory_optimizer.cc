@@ -21,8 +21,12 @@
 #include "open_space_trajectory_optimizer/open_space_trajectory_optimizer.h"
 
 #include <utility>
+#include "planning_data/trajectory/discretized_trajectory_composition.h"
+
 
 using common::math::Vec2d;
+//test my
+
 
 OpenSpaceTrajectoryOptimizer::OpenSpaceTrajectoryOptimizer(
     const OpenSpaceTrajectoryOptimizerConfig &config)
@@ -30,20 +34,22 @@ OpenSpaceTrajectoryOptimizer::OpenSpaceTrajectoryOptimizer(
   // Load config加载配置
   // config_ = config;
   // Initialize hybrid astar class pointer初始化混合A*指针，生成粗略初始轨迹
-  warm_start_.reset(new HybridAStar(config_.planner_open_space_config()));
+  hybrid_a_star_.reset(new HybridAStar(config_.planner_open_space_config()));
   // 构建行车隧道
   construct_corridor_.reset(new ConstructDrivingCorridor(
       config_.planner_open_space_config(), vehicle_param_));
   // Initialize distance approach trajectory smootherclass
   // pointer初始化距离接近优化算法指针
+  //distance_approch_用来求解nlp问题？？
   distance_approach_.reset(
       new DistanceApproachProblem(config_.planner_open_space_config()));
 }
-
+//去除 rotate_angle, translate_origin这可能是apollo_optimizer中的
 int OpenSpaceTrajectoryOptimizer::Plan(
     const MapPoint &start_pose, //起点
     const MapPoint &end_pose,   //终点
-    const std::vector<double> &XYbounds, double rotate_angle,
+    const std::vector<double> &XYbounds, 
+    double rotate_angle,
     const common::math::Vec2d &translate_origin,
     const Eigen::MatrixXi &obstacles_edges_num,
     const std::vector<std::vector<common::math::Vec2d>>
@@ -69,9 +75,16 @@ int OpenSpaceTrajectoryOptimizer::Plan(
   // now)初始速度读假设为0
   HybridAStartResult result;
   //☆☆☆☆☆☆☆☆☆☆☆1.调用混合A*算法☆☆☆☆☆☆☆☆☆☆☆
-  if (warm_start_->Plan(init_x, init_y, init_phi, end_x, end_y, end_phi,
+  if (hybrid_a_star_->Plan(init_x, init_y, init_phi, end_x, end_y, end_phi,
                         XYbounds, obstacles_vertices_vec, &result)) {
     std::cout << "State warm start problem solved successfully!" << std::endl;
+    //test start
+    // plt::plot(result.x,result.y,"red");
+    // plt::show(); 
+    hy_astar_result_=result;
+    // test end;
+
+
   } else {
     std::cout << "State warm start problem failed to solve" << std::endl;
     return 0;
@@ -127,6 +140,8 @@ int OpenSpaceTrajectoryOptimizer::Plan(
       num_point,              //离散点数
       &f_driving_bound, // 1.车辆前圆心可行驶边界n*4矩阵,n*(x_min,x_max,y_min,y_max)
       &b_driving_bound);
+    
+      std::cout<<"构建走廊成功"<<std::endl;
 
   f_bound_ = f_driving_bound;
   r_bound_ = b_driving_bound;
@@ -135,9 +150,9 @@ int OpenSpaceTrajectoryOptimizer::Plan(
   // zhaokun
   time_result_ds = Eigen::MatrixXd::Zero(1, num_point);
   for (int i = 0; i < num_point; i++) {
-    time_result_ds(0, i) = i * 1; // dt ts应该是固定的
+    time_result_ds(0, i) = i * 1; // dt ts应该是固定的 ???乘以1是什么意思不应该是dt吗
   }
-
+//不是已经生成粗轨迹了吗？？？
   GenerateCoarseTraj(
       xWS, uWS, XYbounds, obstacles_edges_num, f_driving_bound,
       b_driving_bound, //此处将障碍物的两个矩阵替换为可行驶隧道的两个矩阵
@@ -155,7 +170,10 @@ int OpenSpaceTrajectoryOptimizer::Plan(
               << std::endl;
     return 0;
   }
-
+//test start
+ state_result_ds_test_=state_result_ds;
+ 
+//test end;
   LoadTrajectory(state_result_ds, control_result_ds, time_result_ds);
 
   // const auto end_timestamp = std::chrono::system_clock::now();
@@ -184,6 +202,9 @@ void OpenSpaceTrajectoryOptimizer::LoadTrajectory(
   std::cout << time_result(0, 0) << std::endl;
   for (size_t i = 0; i < states_size; ++i) {
     common::TrajectoryPoint point;//此处apollo使用的是pathpoint
+    //test start
+    std::cout<< "test result "<<state_result(0,i)<<std::endl;
+    //test end
     point.set_x(state_result(0, i));
     point.set_y(state_result(1, i));
     point.set_theta(state_result(2, i));
@@ -208,6 +229,7 @@ void OpenSpaceTrajectoryOptimizer::LoadTrajectory(
     }
 
     optimized_trajectory_.emplace_back(point);
+    optimized_trajectory_composition_.AddPoint(point);
     last_path_point = cur_path_point;
   }
 }
@@ -330,11 +352,21 @@ void OpenSpaceTrajectoryOptimizer::GetOptimizedTrajectory(
   optimized_trajectory->clear();
   *optimized_trajectory = optimized_trajectory_;
 }
+void OpenSpaceTrajectoryOptimizer::GetOptimizedTrajectory(
+  DiscretizedTrajectoryComposition *optimized_trajectory) {
+ *optimized_trajectory = optimized_trajectory_composition_;
+}
+
 
 void OpenSpaceTrajectoryOptimizer::GetCoarseTrajectory(
     DiscretizedTrajectory *coarse_trajectory) {
   // coarse_trajectory_->clear();
   *coarse_trajectory = coarse_trajectory_;
+}
+void OpenSpaceTrajectoryOptimizer::GetCoarseTrajectory(
+  DiscretizedTrajectoryComposition *coarse_trajectory) {
+// coarse_trajectory_->clear();
+*coarse_trajectory = coarse_trajectory_composition_;
 }
 
 bool OpenSpaceTrajectoryOptimizer::GenerateCoarseTraj(
@@ -396,6 +428,8 @@ void OpenSpaceTrajectoryOptimizer::LoadCoarseTrajectory(
     }
 
     coarse_trajectory_.emplace_back(point);
+    //mhy
+    coarse_trajectory_composition_.AddPoint(point);
     last_path_point = cur_path_point;
   }
 }

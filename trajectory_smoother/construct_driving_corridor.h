@@ -38,9 +38,10 @@ public:
       const Eigen::MatrixXd &xWs, //初始路径的
       const int &n,               //离散点数
       Eigen::MatrixXd *
-          f_bound, // 1.车辆前圆心可行驶边界4*n矩阵,(x_min,x_max,y_min,y_max)'*n
+          f_bound, // 1.车辆前圆心可行驶边界4*n矩阵,(x_min,x_max,y_min,y_max)'*n  ???
       Eigen::MatrixXd *r_bound);
-
+//膨胀后的障碍物？？？
+//return swelling_obstacles_vec_;
   std::vector<std::vector<common::math::Vec2d>> swelling_obstacles_vec();
 
 private:

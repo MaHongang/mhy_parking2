@@ -41,6 +41,7 @@
 #include "planning_data/trajectory/discretized_trajectory.h"
 #include "trajectory_smoother/construct_driving_corridor.h"
 #include "trajectory_smoother/distance_approach_problem.h"
+#include "planning_data/trajectory/discretized_trajectory_composition.h"
 
 //#include "trajectory_smoother/iterative_anchoring_smoother.h"
 
@@ -55,13 +56,18 @@ public:
         const MapPoint &start_pose, //起点
         const MapPoint &end_pose,
         const std::vector<double> &XYbounds, // 4,XYbounds in xmin, xmax, ymin, ymax
+        //rotate_angle和translate_origin是什么？？？和地图有关吗
         double rotate_angle, const common::math::Vec2d &translate_origin,
+        //obstacles_edges_num是什么？？？
         const Eigen::MatrixXi &obstacles_edges_num,                                         // H表示中A和b矩阵维数所需的维数
         /*const Eigen::MatrixXd &f_driving_bound, const Eigen::MatrixXd &b_driving_bound,*/ //障碍物Ax＞b的线性不等式表示，此处在混合A*之后生产行车隧道前后行车隧道链两个约束矩阵
         const std::vector<std::vector<common::math::Vec2d>> &obstacles_vertices_vec,        //以逆时钟顺序存储障碍物顶点的向量
-        double *time_latency);
+        double *time_latency);//time_latency是什么？？？
+  //数据接口 void改变指针来返回， 其他直接return返回
   void GetOptimizedTrajectory(DiscretizedTrajectory *optimized_trajectory);
   void GetCoarseTrajectory(DiscretizedTrajectory *optimized_trajectory);
+  void GetOptimizedTrajectory(DiscretizedTrajectoryComposition *optimized_trajectory);
+  void GetCoarseTrajectory(DiscretizedTrajectoryComposition *optimized_trajectory);
   Eigen::MatrixXd GetFrontDrivingBound();
   Eigen::MatrixXd GetBackDrivingBound();
   std::shared_ptr<ConstructDrivingCorridor> GetConstructCorridorPtr();
@@ -125,16 +131,23 @@ private:
   OpenSpaceTrajectoryOptimizerConfig config_;
   VehicleParam vehicle_param_;
   //对于其他类的调用，采用将其他类定义为私有成员变量的方式
-  std::unique_ptr<HybridAStar> warm_start_;                      //混合A*，
+  std::unique_ptr<HybridAStar> hybrid_a_star_;                      //混合A*，
   std::shared_ptr<ConstructDrivingCorridor> construct_corridor_; //构建行车隧道
-  std::unique_ptr<DistanceApproachProblem> distance_approach_; //距离接近问题
+  std::unique_ptr<DistanceApproachProblem>    distance_approach_   ; //距离接近问题 可以在distanceapproachproblem中切换接口
 
   //输出的结果，定义为私有变量，使用同名的Get方法读取
   std::vector<common::TrajectoryPoint> stitching_trajectory_;
   DiscretizedTrajectory optimized_trajectory_;
   DiscretizedTrajectory coarse_trajectory_;
+  DiscretizedTrajectoryComposition optimized_trajectory_composition_;
+  DiscretizedTrajectoryComposition coarse_trajectory_composition_;
 
   // 1.车辆前圆心可行驶边界n*4矩阵,n*(x_min,x_max,y_min,y_max)
   Eigen::MatrixXd f_bound_;
   Eigen::MatrixXd r_bound_;
+  //test start 测试接口
+  public:
+  HybridAStartResult hy_astar_result_;
+  Eigen::MatrixXd state_result_ds_test_;
+  //test end
 };

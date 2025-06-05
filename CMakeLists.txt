@@ -36,11 +36,13 @@ add_subdirectory(trajectory_smoother)
 include_directories(${PROJECT_SOURCE_DIR}#工程目录
                     "usr/include"#系统目录
                     "usr/local/include"#安装文件目录
-                    "/usr/include/python3.6m"#python目录
+                    "/usr/include/python3.8"#python目录
 )
 
 # Create the executable
-add_executable(parking apollo_parking.cc)
+add_executable(apollo_parking apollo_parking.cc)
+add_executable(corridor_parking corridor_parking.cc)
+
 
 link_directories(
     "usr/local/lib"
@@ -51,11 +53,17 @@ link_directories(
 
 message(${PROJECT_BINARY_DIR})
 
-target_include_directories(parking PUBLIC 
+target_include_directories(apollo_parking PUBLIC 
                             ${PROJECT_SOURCE_DIR}#工程目录
                             "usr/include"#系统目录
                             "usr/local/include"#安装文件目录
-                            "/usr/include/python3.6m"#python目录
+                            "/usr/include/python3.8"#python目录
+)
+target_include_directories(corridor_parking PUBLIC 
+                            ${PROJECT_SOURCE_DIR}#工程目录
+                            "usr/include"#系统目录
+                            "usr/local/include"#安装文件目录
+                            "/usr/include/python3.8"#python目录
 )
 
 #link_directories( ${subprojects_SOURCE_DIR}/lib )
@@ -76,7 +84,15 @@ find_package(Eigen3 REQUIRED)
 file(GLOB GLOG_LIBRARIES /usr/lib/x86_64-linux-gnu/libglog.so)
 
 
-target_link_libraries(parking PUBLIC
+target_link_libraries(apollo_parking PUBLIC
+    open_space_map
+    open_space_trajectory_optimizer
+    configs 
+    common_math
+    Eigen3::Eigen
+    ${GLOG_LIBRARIES}
+)
+target_link_libraries(corridor_parking PUBLIC
     open_space_map
     open_space_trajectory_optimizer
     configs 
@@ -93,7 +109,7 @@ target_link_libraries(parking PUBLIC
 #link_directories的位置得放到add_executable前面
 link_directories(
     "usr/local/lib"
-    "usr/local/lib64"
+    
     "usr/lib"
     ${PROJECT_BINARY_DIR}/lib
 )
@@ -104,7 +120,7 @@ target_include_directories(corridor_test PUBLIC
                             ${PROJECT_SOURCE_DIR}#工程目录
                             "usr/include"#系统目录
                             "usr/local/include"#安装文件目录
-                            "/usr/include/python3.6m"#python目录
+                            "/usr/include/python3.8"#python目录
 )
 
 target_link_libraries(corridor_test PUBLIC
@@ -113,4 +129,5 @@ target_link_libraries(corridor_test PUBLIC
     configs 
     common_math
     Eigen3::Eigen
+    coarse_trajectory_generator
 )

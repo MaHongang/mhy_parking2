@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../configs/open_space_trajectory_optimizer_config.h
+planner_open_space_config.h
+../configs/planner_open_space_config.h
+
+../configs/planner_open_space_config.h
+string
+-
+
+/home/mhy/parking/configs/open_space_trajectory_optimizer_config.cc
+configs/open_space_trajectory_optimizer_config.h
+/home/mhy/parking/configs/configs/open_space_trajectory_optimizer_config.h
+

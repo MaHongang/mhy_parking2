@@ -18,7 +18,7 @@ struct HybridAstar {
 
   double traj_forward_penalty = 1.0; //
   double traj_back_penalty = 1.0;
-  double traj_gear_switch_penalty = 10.0; //行驶方向切换惩罚
+  double traj_gear_switch_penalty = 1.0; //行驶方向切换惩罚
   double traj_steer_penalty = 0;          //方向盘转角惩罚
   double traj_steer_change_penalty = 0.1; //方向盘方向切换惩罚
 
@@ -48,9 +48,9 @@ struct DistanceApproachConfig {
   double weight_a = 1.0;        // 1.271
   double weight_steer_rate = 2; // 2
   double weight_a_rate = 2.5;   // 2.5
-  double weight_x = 9;          // 18        //符合A*路径代价
-  double weight_y = 7;          // 14
-  double weight_phi = 5;        // 10
+  double weight_x = 1;          // 18        //符合A*路径代价
+  double weight_y = 1;          // 14
+  double weight_phi = 1;        // 10
   double weight_v = 0.0;
   double weight_steer_stitching = 1.75; // defualt 1.75
   double weight_a_stitching = 3.25;     // 3.25
@@ -79,7 +79,7 @@ struct DistanceApproachConfig {
   // std::string distance_approach_mode = "DISTANCE_APPROACH_IPOPT";
   //安全距离可调
   std::string distance_approach_mode =
-      "DISTANCE_APPROACH_IPOPT_RELAX_END_SLACK";
+      "DISTANCE_APPROACH_CORRIDOR_IPOPT";
   bool enable_check_initial_state = false;
   bool enable_jacobian_ad = true;
 };
