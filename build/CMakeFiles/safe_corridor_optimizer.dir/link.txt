@@ -1,0 +1,2 @@
+/usr/bin/ar qc libsafe_corridor_optimizer.a CMakeFiles/safe_corridor_optimizer.dir/safe_corridor_trajectory_optimizer/open_space_trajectory_optimizer.cc.o CMakeFiles/safe_corridor_optimizer.dir/safe_corridor_trajectory_optimizer/construct_driving_corridor.cc.o
+/usr/bin/ranlib libsafe_corridor_optimizer.a

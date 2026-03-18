@@ -20,18 +20,24 @@
  */
 
 #pragma once
+#include <cstddef>
 #include <iostream>
 #include <vector>
 
-#include <coin-or/IpIpoptApplication.hpp>
-#include <coin-or/IpSolveStatistics.hpp>
+#include <coin/IpIpoptApplication.hpp>
+#include <coin/IpSolveStatistics.hpp>
 
 #include "eigen3/Eigen/Dense"
+#include "configs/planner_open_space_config.h"
+#include "trajectory_smoother/distance_approach_interface.h"
+#include "trajectory_smoother/distance_approach_ipopt_interface.h"
+#include "trajectory_smoother/distance_approach_ipopt_relax_end_interface.h"
+#include "trajectory_smoother/distance_approach_ipopt_relax_end_slack_interface.h"
 
 //#include "modules/planning/proto/planning.pb.h"
-
 //#include "modules/planning/common/planning_gflags.h"
-#include "trajectory_smoother/distance_approach_ipopt_corridor_interface.h"
+// Note: corridor interface is in safe_corridor_trajectory_optimizer module
+// #include "trajectory_smoother/distance_approach_ipopt_corridor_interface.h"
 
 class DistanceApproachProblem {
 public:

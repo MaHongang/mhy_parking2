@@ -53,27 +53,60 @@ bool DistanceApproachProblem::Solve(
   //定义父类指针，通过判断指向子类对象，调用不同的优化程序
   DistanceApproachInterface *ptop = nullptr; //接口类指针
 
+  // 初始化 warm start 变量
+  Eigen::MatrixXd l_warm_up = Eigen::MatrixXd::Zero(obstacles_edges_num.sum(), horizon + 1);
+  Eigen::MatrixXd n_warm_up = Eigen::MatrixXd::Zero(4 * obstacles_num, horizon + 1);
+  Eigen::MatrixXd s_warm_up = Eigen::MatrixXd::Zero(4 * obstacles_num, horizon + 1);
+  
   if (planner_open_space_config_.distance_approach_config
           .distance_approach_mode == "") { //默认模式
-    std::cout << "优化参数未设置" << std::endl;
+    std::cout << "优化参数未设置，使用默认 IPOPT 模式" << std::endl;
+    ptop = new DistanceApproachIPOPTInterface(
+        horizon, ds_init, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF,
+        last_time_u, XYbounds, obstacles_edges_num, obstacles_num,
+        f_driving_bound, b_driving_bound, planner_open_space_config_);
+  } else if (planner_open_space_config_.distance_approach_config
+                 .distance_approach_mode == "DISTANCE_APPROACH_IPOPT") {
+    std::cout << "DISTANCE_APPROACH_IPOPT模式" << std::endl;
+    ptop = new DistanceApproachIPOPTInterface(
+        horizon, ds_init, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF,
+        last_time_u, XYbounds, obstacles_edges_num, obstacles_num,
+        f_driving_bound, b_driving_bound, planner_open_space_config_);
   } else if (planner_open_space_config_.distance_approach_config
                  .distance_approach_mode ==
-             "DISTANCE_APPROACH_CORRIDOR_IPOPT") {
-              std::cout << "DISTANCE_APPROACH_CORRIDOR_IPOPT模式" << std::endl;          
-    ptop = new DistanceApproachIPOPTCorridorInterface(
-        horizon, ds_init, ego, xWS, uWS, x0, xF, last_time_u, XYbounds,
-        obstacles_edges_num, obstacles_num, f_driving_bound, b_driving_bound,
-        planner_open_space_config_);
+             "DISTANCE_APPROACH_IPOPT_RELAX_END") {
+    std::cout << "DISTANCE_APPROACH_IPOPT_RELAX_END模式" << std::endl;
+    ptop = new DistanceApproachIPOPTRelaxEndInterface(
+        horizon, ds_init, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF,
+        last_time_u, XYbounds, obstacles_edges_num, obstacles_num,
+        f_driving_bound, b_driving_bound, planner_open_space_config_);
+  } else if (planner_open_space_config_.distance_approach_config
+                 .distance_approach_mode ==
+             "DISTANCE_APPROACH_IPOPT_RELAX_END_SLACK") {
+    std::cout << "DISTANCE_APPROACH_IPOPT_RELAX_END_SLACK模式" << std::endl;
+    ptop = new DistanceApproachIPOPTRelaxEndSlackInterface(
+        horizon, ds_init, ego, xWS, uWS, l_warm_up, n_warm_up, s_warm_up, x0, xF,
+        last_time_u, XYbounds, obstacles_edges_num, obstacles_num,
+        f_driving_bound, b_driving_bound, planner_open_space_config_);
+  } else {
+    std::cout << "未知的优化模式，使用默认 IPOPT 模式" << std::endl;
+    ptop = new DistanceApproachIPOPTInterface(
+        horizon, ds_init, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF,
+        last_time_u, XYbounds, obstacles_edges_num, obstacles_num,
+        f_driving_bound, b_driving_bound, planner_open_space_config_);
   }
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop; //将指针传递给problem IPOPT
 
+  std::cout << "DEBUG: Creating IpoptApplication..." << std::endl;
   // Create an instance of the IpoptApplication//实例化一个IPOPT求解器对象
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
+  std::cout << "DEBUG: IpoptApplication created, setting options..." << std::endl;
   //对优化器进行设置
   app->Options()->SetIntegerValue(
       "print_level", planner_open_space_config_.distance_approach_config
                          .ipopt_config.ipopt_print_level);
+  std::cout << "DEBUG: print_level set" << std::endl;
   // zhaokun20221013参数未设置
   // app->Options()->SetIntegerValue(
   //     "mumps_mem_percent", planner_open_space_config_.distance_approach_config
@@ -113,14 +146,22 @@ bool DistanceApproachProblem::Solve(
   app->Options()->SetNumericValue(
       "mu_init", planner_open_space_config_.distance_approach_config
                      .ipopt_config.ipopt_mu_init);
+  std::cout << "DEBUG: All options set" << std::endl;
 
+  std::cout << "DEBUG: IPOPT app initializing..." << std::endl;
+  
+  // 先初始化，再设置选项
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
-    std::cout << "*** Distance Approach problem error during initialization!";
+    std::cout << "*** Distance Approach problem error during initialization! Status: " << status << std::endl;
     return false;
   }
+  std::cout << "DEBUG: IPOPT app initialized successfully" << std::endl;
+  std::cout << "DEBUG: calling OptimizeTNLP..." << std::endl;
+  std::cout << "DEBUG: problem pointer is " << (ptop ? "valid" : "null") << std::endl;
 
   status = app->OptimizeTNLP(problem); //将问题描述传递给求解器，进行求解。
+  std::cout << "DEBUG: OptimizeTNLP returned with status: " << status << std::endl;
 
   if (status == Ipopt::Solve_Succeeded ||
       status == Ipopt::Solved_To_Acceptable_Level) {

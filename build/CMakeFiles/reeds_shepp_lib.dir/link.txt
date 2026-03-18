@@ -1,0 +1,2 @@
+/usr/bin/ar qc libreeds_shepp_lib.a CMakeFiles/reeds_shepp_lib.dir/coarse_trajectory_generator/reeds_shepp_path.cc.o CMakeFiles/reeds_shepp_lib.dir/coarse_trajectory_generator/node3d.cc.o
+/usr/bin/ranlib libreeds_shepp_lib.a

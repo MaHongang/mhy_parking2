@@ -1,3 +1,3 @@
 file(REMOVE_RECURSE
-  "../../lib/libcommon_math.a"
+  "libcommon_math.a"
 )

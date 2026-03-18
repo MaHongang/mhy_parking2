@@ -15,14 +15,28 @@ target_include_directories(matplotlib_cpp INTERFACE
     "usr/include"#系统目录
     "usr/local/include"#安装文件目录
     ${Python3_INCLUDE_DIRS}
-    ${Numpy_INCLUDE_DIRS}
+    ${Python3_NumPy_INCLUDE_DIRS}
 )
 
 target_link_libraries(matplotlib_cpp INTERFACE
                       ${Python3_LIBRARIES}
-                      ${Numpy_LIBRARIES}
 )
 
 target_compile_features(matplotlib_cpp INTERFACE
   cxx_std_17
+)
+
+# ==================== Independent Test for matplotlib ====================
+# Standalone test program that doesn't affect other targets
+add_executable(test_matplot matplot_test.cc)
+
+target_link_libraries(test_matplot PRIVATE
+    matplotlib_cpp
+    Python3::Python
+    Python3::NumPy
+)
+
+# Set output directory to avoid conflicts
+set_target_properties(test_matplot PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests"
 )

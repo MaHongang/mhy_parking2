@@ -1,8 +1,8 @@
 file(REMOVE_RECURSE
-  "../lib/libopen_space_map.a"
-  "../lib/libopen_space_map.pdb"
   "CMakeFiles/open_space_map.dir/open_space_map.cc.o"
   "CMakeFiles/open_space_map.dir/open_space_map.cc.o.d"
+  "libopen_space_map.a"
+  "libopen_space_map.pdb"
 )
 
 # Per-language clean rules from dependency scanning.

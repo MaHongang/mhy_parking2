@@ -20,10 +20,11 @@
 
 #pragma once
 
+#include <cstddef>
 #include <vector>
 
-#include <coin-or/IpIpoptApplication.hpp>
-#include <coin-or/IpSolveStatistics.hpp>
+#include <coin/IpIpoptApplication.hpp>
+#include <coin/IpSolveStatistics.hpp>
 
 #include "Eigen/Dense"
 #include "configs/planner_open_space_config.h"

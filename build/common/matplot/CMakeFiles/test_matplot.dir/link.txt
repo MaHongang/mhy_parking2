@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/test_matplot.dir/matplot_test.cc.o -o ../../tests/test_matplot  /usr/lib/x86_64-linux-gnu/libpython3.10.so /usr/lib/x86_64-linux-gnu/libpython3.10.so 

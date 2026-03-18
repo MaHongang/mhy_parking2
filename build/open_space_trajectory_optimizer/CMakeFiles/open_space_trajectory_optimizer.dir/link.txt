@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../lib/libopen_space_trajectory_optimizer.a CMakeFiles/open_space_trajectory_optimizer.dir/open_space_trajectory_optimizer.cc.o CMakeFiles/open_space_trajectory_optimizer.dir/apollo_trajectory_optimizer.cc.o
-/usr/bin/ranlib ../lib/libopen_space_trajectory_optimizer.a

@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <algorithm>
 #include <limits>
 #include <vector>
@@ -31,8 +32,8 @@
 #include <adolc/adolc_sparse.h>
 #include <adolc/adouble.h>
 
-#include <coin-or/IpTNLP.hpp>
-#include <coin-or/IpTypes.hpp>
+#include <coin/IpTNLP.hpp>
+#include <coin/IpTypes.hpp>
 
 #include "Eigen/Dense"
 

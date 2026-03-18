@@ -1,6 +1,4 @@
 file(REMOVE_RECURSE
-  "../../lib/libcommon_math.a"
-  "../../lib/libcommon_math.pdb"
   "CMakeFiles/common_math.dir/aabox2d.cc.o"
   "CMakeFiles/common_math.dir/aabox2d.cc.o.d"
   "CMakeFiles/common_math.dir/box2d.cc.o"
@@ -15,6 +13,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/common_math.dir/polygon2d.cc.o.d"
   "CMakeFiles/common_math.dir/vec2d.cc.o"
   "CMakeFiles/common_math.dir/vec2d.cc.o.d"
+  "libcommon_math.a"
+  "libcommon_math.pdb"
 )
 
 # Per-language clean rules from dependency scanning.

@@ -22,13 +22,14 @@
 #pragma once
 
 #include <adolc/adolc.h>
+#include <stddef.h>
 #include <adolc/adolc_openmp.h>
 #include <adolc/adolc_sparse.h>
 #include <adolc/adouble.h>
 #include <omp.h>
 
-#include <coin-or/IpTNLP.hpp>
-#include <coin-or/IpTypes.hpp>
+#include <coin/IpTNLP.hpp>
+#include <coin/IpTypes.hpp>
 
 #include "eigen3/Eigen/Dense"
 

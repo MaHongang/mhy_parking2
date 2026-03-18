@@ -1,3 +1,3 @@
 file(REMOVE_RECURSE
-  "../lib/libplanning_data.a"
+  "libplanning_data.a"
 )

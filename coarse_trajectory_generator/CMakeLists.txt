@@ -14,3 +14,7 @@ target_link_libraries(coarse_trajectory_generator PUBLIC
                         configs
                         planning_data
 )
+
+
+
+

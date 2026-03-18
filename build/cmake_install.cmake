@@ -1,4 +1,4 @@
-# Install script for directory: /home/mhy/parking
+# Install script for directory: /home/mhy/manage_valet/safety_corridor_cpp
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -12,7 +12,7 @@ if(NOT DEFINED CMAKE_INSTALL_CONFIG_NAME)
     string(REGEX REPLACE "^[^A-Za-z0-9_]+" ""
            CMAKE_INSTALL_CONFIG_NAME "${BUILD_TYPE}")
   else()
-    set(CMAKE_INSTALL_CONFIG_NAME "Debug")
+    set(CMAKE_INSTALL_CONFIG_NAME "")
   endif()
   message(STATUS "Install configuration: \"${CMAKE_INSTALL_CONFIG_NAME}\"")
 endif()
@@ -44,13 +44,12 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/mhy/parking/build/common/cmake_install.cmake")
-  include("/home/mhy/parking/build/configs/cmake_install.cmake")
-  include("/home/mhy/parking/build/open_space_map/cmake_install.cmake")
-  include("/home/mhy/parking/build/planning_data/cmake_install.cmake")
-  include("/home/mhy/parking/build/open_space_trajectory_optimizer/cmake_install.cmake")
-  include("/home/mhy/parking/build/coarse_trajectory_generator/cmake_install.cmake")
-  include("/home/mhy/parking/build/trajectory_smoother/cmake_install.cmake")
+  include("/home/mhy/manage_valet/safety_corridor_cpp/build/common/cmake_install.cmake")
+  include("/home/mhy/manage_valet/safety_corridor_cpp/build/configs/cmake_install.cmake")
+  include("/home/mhy/manage_valet/safety_corridor_cpp/build/planning_data/cmake_install.cmake")
+  include("/home/mhy/manage_valet/safety_corridor_cpp/build/coarse_trajectory_generator/cmake_install.cmake")
+  include("/home/mhy/manage_valet/safety_corridor_cpp/build/open_space_map/cmake_install.cmake")
+  include("/home/mhy/manage_valet/safety_corridor_cpp/build/trajectory_smoother/cmake_install.cmake")
 
 endif()
 
@@ -62,5 +61,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/mhy/parking/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/mhy/manage_valet/safety_corridor_cpp/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

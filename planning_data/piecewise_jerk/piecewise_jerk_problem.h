@@ -121,11 +121,16 @@ public:
 
 protected:
   // naming convention follows osqp solver.
+  //hessian matrix
   virtual void CalculateKernel(std::vector<c_float> *P_data,
                                std::vector<c_int> *P_indices,
                                std::vector<c_int> *P_indptr) = 0;
+  // linear term 
+  //matrix q in objective function
 
   virtual void CalculateOffset(std::vector<c_float> *q) = 0;
+  //constrainst matrix
+  //matrix A in constrainst
 
   virtual void CalculateAffineConstraint(std::vector<c_float> *A_data,
                                          std::vector<c_int> *A_indices,

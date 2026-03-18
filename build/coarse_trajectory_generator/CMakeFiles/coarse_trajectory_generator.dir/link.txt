@@ -1,2 +1,2 @@
-/usr/bin/ar qc ../lib/libcoarse_trajectory_generator.a CMakeFiles/coarse_trajectory_generator.dir/grid_search.cc.o CMakeFiles/coarse_trajectory_generator.dir/hybrid_a_star.cc.o CMakeFiles/coarse_trajectory_generator.dir/node3d.cc.o CMakeFiles/coarse_trajectory_generator.dir/reeds_shepp_path.cc.o
-/usr/bin/ranlib ../lib/libcoarse_trajectory_generator.a
+/usr/bin/ar qc libcoarse_trajectory_generator.a CMakeFiles/coarse_trajectory_generator.dir/grid_search.cc.o CMakeFiles/coarse_trajectory_generator.dir/hybrid_a_star.cc.o CMakeFiles/coarse_trajectory_generator.dir/node3d.cc.o CMakeFiles/coarse_trajectory_generator.dir/reeds_shepp_path.cc.o
+/usr/bin/ranlib libcoarse_trajectory_generator.a

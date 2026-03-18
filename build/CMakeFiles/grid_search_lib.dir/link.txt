@@ -1,0 +1,2 @@
+/usr/bin/ar qc libgrid_search_lib.a CMakeFiles/grid_search_lib.dir/coarse_trajectory_generator/grid_search.cc.o
+/usr/bin/ranlib libgrid_search_lib.a

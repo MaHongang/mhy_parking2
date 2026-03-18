@@ -1,3 +1,3 @@
 file(REMOVE_RECURSE
-  "../lib/libtrajectory_smoother.a"
+  "libtrajectory_smoother.a"
 )
